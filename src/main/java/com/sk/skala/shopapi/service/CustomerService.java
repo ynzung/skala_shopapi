@@ -5,19 +5,23 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sk.skala.shopapi.dto.CheckInResponse;
 import com.sk.skala.shopapi.dto.CustomerDto;
 import com.sk.skala.shopapi.dto.OrderItemDto;
 import com.sk.skala.shopapi.dto.OrderListDto;
 import com.sk.skala.shopapi.dto.SignupResponse;
 import com.sk.skala.shopapi.entity.Customer;
+import com.sk.skala.shopapi.entity.DailyCheckIn;
 import com.sk.skala.shopapi.entity.OrderItem;
 import com.sk.skala.shopapi.entity.Product;
 import com.sk.skala.shopapi.exception.DataNotFoundException;
 import com.sk.skala.shopapi.exception.DuplicateCustomerException;
 import com.sk.skala.shopapi.exception.InsufficientFundsException;
 import com.sk.skala.shopapi.exception.ParameterException;
+import com.sk.skala.shopapi.exception.RewardAlreadyReceivedException;
 import com.sk.skala.shopapi.repository.CustomerProductRepository;
 import com.sk.skala.shopapi.repository.CustomerRepository;
+import com.sk.skala.shopapi.repository.DailyCheckInRepository;
 import com.sk.skala.shopapi.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -28,10 +32,12 @@ import lombok.RequiredArgsConstructor;
 public class CustomerService {
 
     private static final double SIGNUP_BONUS_POINT = 3000.0;
+    private static final double DAILY_CHECK_IN_POINT = 1000.0;
 
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final CustomerProductRepository customerProductRepository;
+    private final DailyCheckInRepository dailyCheckInRepository;
 
     // 1. 전체 고객 목록 조회
     public List<CustomerDto> getAllCustomer() {
@@ -124,7 +130,38 @@ public class CustomerService {
                 customerProductRepository.findByCustomerCustomerId(customerId);
 
         customerProductRepository.deleteAll(orderItems);
+        dailyCheckInRepository.deleteByCustomerCustomerId(customerId);
         customerRepository.delete(customer);
+    }
+
+    @Transactional
+    public CheckInResponse checkIn(String customerId) {
+        Customer customer = findCustomerById(customerId);
+        LocalDate today = LocalDate.now();
+
+        if (dailyCheckInRepository
+                .existsByCustomerCustomerIdAndCheckInDate(customerId, today)) {
+            throw new RewardAlreadyReceivedException(
+                    "오늘은 이미 출석 포인트를 받았습니다."
+            );
+        }
+
+        dailyCheckInRepository.save(
+                DailyCheckIn.builder()
+                        .customer(customer)
+                        .checkInDate(today)
+                        .build()
+        );
+        customer.setCustomerPoint(
+                customer.getCustomerPoint() + DAILY_CHECK_IN_POINT
+        );
+        customerRepository.save(customer);
+
+        return new CheckInResponse(
+                "출석 체크가 완료되었습니다.",
+                DAILY_CHECK_IN_POINT,
+                customer.getCustomerPoint()
+        );
     }
 
     // 7. 상품 주문

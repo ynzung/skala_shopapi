@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.sk.skala.shopapi.dto.CustomerDto;
+import com.sk.skala.shopapi.dto.CheckInResponse;
 import com.sk.skala.shopapi.dto.LoginRequest;
 import com.sk.skala.shopapi.dto.OrderItemDto;
 import com.sk.skala.shopapi.dto.OrderListDto;
@@ -115,6 +116,14 @@ public class CustomerController {
     ) {
         customerService.deleteCustomer(customerId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{customerId}/check-in")
+    @Operation(summary = "일일 출석 체크", description = "하루 한 번 1,000포인트를 지급합니다.")
+    public ResponseEntity<CheckInResponse> checkIn(
+            @PathVariable String customerId
+    ) {
+        return ResponseEntity.ok(customerService.checkIn(customerId));
     }
 
     @PostMapping("/order")

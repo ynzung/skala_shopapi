@@ -29,6 +29,14 @@ public class GlobalExceptionHandler {
         return response(ErrorCode.DUPLICATE_CUSTOMER_ID, exception.getMessage());
     }
 
+    @ExceptionHandler(RewardAlreadyReceivedException.class)
+    public ResponseEntity<ErrorResponse> handleRewardAlreadyReceived(
+            RewardAlreadyReceivedException exception
+    ) {
+        return response(ErrorCode.REWARD_ALREADY_RECEIVED, exception.getMessage());
+    }
+
+
     @ExceptionHandler(ParameterException.class)
     public ResponseEntity<ErrorResponse> handleParameter(
             ParameterException exception
