@@ -8,9 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.sk.skala.shopapi.entity.Favorite;
 
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
-    boolean existsByCustomerCustomerIdAndProductId(String customerId, Long productId);
-
-    List<Favorite> findByCustomerCustomerId(String customerId);
+    List<Favorite> findByCustomerCustomerIdAndFavoriteTrue(String customerId);
 
     Optional<Favorite> findByCustomerCustomerIdAndProductId(
             String customerId,

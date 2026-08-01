@@ -10,7 +10,6 @@ import com.sk.skala.shopapi.entity.Customer;
 import com.sk.skala.shopapi.entity.Favorite;
 import com.sk.skala.shopapi.entity.Product;
 import com.sk.skala.shopapi.exception.DataNotFoundException;
-import com.sk.skala.shopapi.exception.DuplicateFavoriteException;
 import com.sk.skala.shopapi.repository.CustomerRepository;
 import com.sk.skala.shopapi.repository.FavoriteRepository;
 import com.sk.skala.shopapi.repository.ProductRepository;
@@ -26,39 +25,30 @@ public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
 
     @Transactional
-    public FavoriteResponse addFavorite(String customerId, Long productId) {
+    public FavoriteResponse toggleFavorite(String customerId, Long productId) {
         Customer customer = findCustomerById(customerId);
         Product product = findProductById(productId);
+        Favorite favorite = favoriteRepository
+                .findByCustomerCustomerIdAndProductId(customerId, productId)
+                .orElseGet(() -> Favorite.builder()
+                        .customer(customer)
+                        .product(product)
+                        .favorite(true)
+                        .build());
 
-        if (favoriteRepository
-                .existsByCustomerCustomerIdAndProductId(customerId, productId)) {
-            throw new DuplicateFavoriteException("이미 찜한 상품입니다.");
+        if (favorite.getId() != null) {
+            favorite.toggle();
         }
-
-        favoriteRepository.save(Favorite.builder()
-                .customer(customer)
-                .product(product)
-                .build());
-        return convertToDto(product);
+        favoriteRepository.save(favorite);
+        return convertToDto(favorite);
     }
 
     public List<FavoriteResponse> getFavorites(String customerId) {
         findCustomerById(customerId);
-        return favoriteRepository.findByCustomerCustomerId(customerId)
+        return favoriteRepository.findByCustomerCustomerIdAndFavoriteTrue(customerId)
                 .stream()
-                .map(favorite -> convertToDto(favorite.getProduct()))
+                .map(this::convertToDto)
                 .toList();
-    }
-
-    @Transactional
-    public void deleteFavorite(String customerId, Long productId) {
-        findCustomerById(customerId);
-        Favorite favorite = favoriteRepository
-                .findByCustomerCustomerIdAndProductId(customerId, productId)
-                .orElseThrow(() -> new DataNotFoundException(
-                        "찜한 상품을 찾을 수 없습니다."
-                ));
-        favoriteRepository.delete(favorite);
     }
 
     private Customer findCustomerById(String customerId) {
@@ -75,11 +65,13 @@ public class FavoriteService {
                 ));
     }
 
-    private FavoriteResponse convertToDto(Product product) {
+    private FavoriteResponse convertToDto(Favorite favorite) {
+        Product product = favorite.getProduct();
         return new FavoriteResponse(
                 product.getId(),
                 product.getProductName(),
-                product.getProductPrice()
+                product.getProductPrice(),
+                favorite.isFavorite()
         );
     }
 }

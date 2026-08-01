@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sk.skala.shopapi.dto.reward.CheckInResponse;
-import com.sk.skala.shopapi.exception.DuplicateFavoriteException;
 import com.sk.skala.shopapi.exception.RewardAlreadyReceivedException;
 import com.sk.skala.shopapi.repository.CustomerRepository;
 import com.sk.skala.shopapi.service.FavoriteService;
@@ -45,15 +44,10 @@ class CustomerFeatureTests {
 
     @Test
     void 찜한_상품을_추가하고_삭제할_수_있다() {
-        favoriteService.addFavorite("customer1", 1L);
+        assertTrue(favoriteService.toggleFavorite("customer1", 1L).favorite());
 
         assertEquals(1, favoriteService.getFavorites("customer1").size());
-        assertThrows(
-                DuplicateFavoriteException.class,
-                () -> favoriteService.addFavorite("customer1", 1L)
-        );
-
-        favoriteService.deleteFavorite("customer1", 1L);
+        assertFalse(favoriteService.toggleFavorite("customer1", 1L).favorite());
         assertTrue(favoriteService.getFavorites("customer1").isEmpty());
     }
 }
