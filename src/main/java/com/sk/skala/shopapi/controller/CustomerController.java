@@ -1,5 +1,6 @@
 package com.sk.skala.shopapi.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -8,10 +9,12 @@ import org.springframework.web.bind.annotation.*;
 
 import com.sk.skala.shopapi.dto.customer.CustomerResponse;
 import com.sk.skala.shopapi.dto.customer.LoginRequest;
+import com.sk.skala.shopapi.dto.customer.LoginResponse;
 import com.sk.skala.shopapi.dto.customer.SignupRequest;
 import com.sk.skala.shopapi.dto.customer.SignupResponse;
 import com.sk.skala.shopapi.dto.customer.UpdateCustomerRequest;
 import com.sk.skala.shopapi.service.CustomerService;
+import com.sk.skala.shopapi.service.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "고객 관리", description = "고객 CRUD API")
 public class CustomerController {
     private final CustomerService customerService;
+    private final AuthService authService;
 
     @GetMapping("/list")
     @Operation(summary = "전체 고객 조회", description = "등록된 모든 고객 목록을 조회합니다.")
@@ -42,12 +46,10 @@ public class CustomerController {
 
     @PostMapping("/login")
     @Operation(summary = "고객 로그인", description = "고객 아이디와 비밀번호를 확인합니다.")
-    public ResponseEntity<CustomerResponse> loginCustomer(
+    public ResponseEntity<LoginResponse> loginCustomer(
             @Valid @RequestBody LoginRequest request
     ) {
-        return ResponseEntity.ok(customerService.loginCustomer(
-                request.customerId(), request.customerPassword()
-        ));
+        return ResponseEntity.ok(authService.login(request));
     }
 
     @PutMapping("/{customerId}")

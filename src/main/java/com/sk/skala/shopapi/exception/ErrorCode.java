@@ -7,6 +7,7 @@ public enum ErrorCode {
     PARAMETER_ERROR(HttpStatus.BAD_REQUEST),
     DUPLICATE_CUSTOMER_ID(HttpStatus.CONFLICT),
     REWARD_ALREADY_RECEIVED(HttpStatus.CONFLICT),
+    AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED),
     DATA_NOT_FOUND(HttpStatus.NOT_FOUND);
 
     private final HttpStatus status;
