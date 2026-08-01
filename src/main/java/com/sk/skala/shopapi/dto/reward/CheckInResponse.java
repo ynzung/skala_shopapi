@@ -1,4 +1,4 @@
-package com.sk.skala.shopapi.dto;
+package com.sk.skala.shopapi.dto.reward;
 
 public record CheckInResponse(
         String message,

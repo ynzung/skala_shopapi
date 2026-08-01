@@ -8,7 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.sk.skala.shopapi.dto.ProductDto;
+import com.sk.skala.shopapi.dto.product.ProductRequest;
+import com.sk.skala.shopapi.dto.product.ProductResponse;
 import com.sk.skala.shopapi.service.ProductService;
 
 import java.util.List;
@@ -26,8 +27,8 @@ public class ProductController {
             summary = "전체 상품 조회",
             description = "등록된 모든 상품 목록을 조회합니다."
     )
-    public ResponseEntity<List<ProductDto>> getAllProducts() {
-        List<ProductDto> products = productService.getAllProduct();
+    public ResponseEntity<List<ProductResponse>> getAllProducts() {
+        List<ProductResponse> products = productService.getAllProduct();
         return ResponseEntity.ok(products);
     }
     
@@ -36,8 +37,8 @@ public class ProductController {
             summary = "상품 상세 조회",
             description = "상품 ID로 상품 상세 정보를 조회합니다."
     )
-    public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {
-        ProductDto product = productService.getProductById(id);
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
+        ProductResponse product = productService.getProductById(id);
         return ResponseEntity.ok(product);
     }
 
@@ -46,11 +47,11 @@ public class ProductController {
             summary = "상품 등록",
             description = "새로운 상품을 등록합니다."
     )
-    public ResponseEntity<ProductDto> createProduct(
-            @Valid @RequestBody ProductDto productDto
+    public ResponseEntity<ProductResponse> createProduct(
+            @Valid @RequestBody ProductRequest request
     ) {
-        ProductDto createdProduct =
-                productService.createProduct(productDto);
+        ProductResponse createdProduct =
+                productService.createProduct(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(createdProduct);
@@ -61,12 +62,12 @@ public class ProductController {
             summary = "상품 정보 수정",
             description = "상품 ID에 해당하는 상품명과 가격을 수정합니다."
     )
-    public ResponseEntity<ProductDto> updateProduct(
+    public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable Long id,
-            @Valid @RequestBody ProductDto productDto
+            @Valid @RequestBody ProductRequest request
     ) {
-        ProductDto updatedProduct =
-                productService.updateProduct(id, productDto);
+        ProductResponse updatedProduct =
+                productService.updateProduct(id, request);
         return ResponseEntity.ok(updatedProduct);
     }
 

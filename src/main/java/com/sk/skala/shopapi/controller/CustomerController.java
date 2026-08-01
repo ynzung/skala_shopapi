@@ -1,24 +1,22 @@
 package com.sk.skala.shopapi.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.sk.skala.shopapi.dto.CustomerDto;
-import com.sk.skala.shopapi.dto.CheckInResponse;
-import com.sk.skala.shopapi.dto.FavoriteDto;
-import com.sk.skala.shopapi.dto.LoginRequest;
-import com.sk.skala.shopapi.dto.OrderItemDto;
-import com.sk.skala.shopapi.dto.OrderListDto;
-import com.sk.skala.shopapi.dto.OrderRequest;
-import com.sk.skala.shopapi.dto.SignupResponse;
+import com.sk.skala.shopapi.dto.customer.CustomerResponse;
+import com.sk.skala.shopapi.dto.customer.LoginRequest;
+import com.sk.skala.shopapi.dto.customer.SignupRequest;
+import com.sk.skala.shopapi.dto.customer.SignupResponse;
+import com.sk.skala.shopapi.dto.customer.UpdateCustomerRequest;
 import com.sk.skala.shopapi.service.CustomerService;
 
-import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -28,162 +26,47 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @GetMapping("/list")
-    @Operation(
-            summary = "전체 고객 조회",
-            description = "등록된 모든 고객 목록을 조회합니다."
-    )
-    public ResponseEntity<List<CustomerDto>> getAllCustomers() {
-        List<CustomerDto> customers = customerService.getAllCustomer();
-        return ResponseEntity.ok(customers);
-    }
-    
-    @GetMapping("/{customerId}")
-    @Operation(
-            summary = "고객 상세 조회",
-            description = "고객 정보와 고객이 주문한 상품 목록을 함께 조회합니다."
-    )
-    public ResponseEntity<OrderListDto> getCustomerById(
-            @PathVariable String customerId
-    ) {
-        OrderListDto customer =
-                customerService.getCustomerById(customerId);
-        return ResponseEntity.ok(customer);
-    }
-
-    @GetMapping("/{customerId}/products")
-    @Operation(
-            summary = "고객 주문 상품 정보 조회",
-            description = "고객이 주문해 보유하고 있는 상품 목록을 조회합니다."
-    )
-    public ResponseEntity<List<OrderItemDto>> getCustomerProducts(
-            @PathVariable String customerId
-    ) {
-        List<OrderItemDto> products =
-                customerService.getCustomerProducts(customerId);
-        return ResponseEntity.ok(products);
+    @Operation(summary = "전체 고객 조회", description = "등록된 모든 고객 목록을 조회합니다.")
+    public ResponseEntity<List<CustomerResponse>> getAllCustomers() {
+        return ResponseEntity.ok(customerService.getAllCustomer());
     }
 
     @PostMapping
-    @Operation(
-            summary = "고객 회원가입",
-            description = "새로운 고객을 등록합니다."
-    )
+    @Operation(summary = "고객 회원가입", description = "새로운 고객을 등록합니다.")
     public ResponseEntity<SignupResponse> createCustomer(
-            @RequestBody CustomerDto customerDto
+            @Valid @RequestBody SignupRequest request
     ) {
-        SignupResponse response =
-                customerService.createCustomer(customerDto);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(customerService.createCustomer(request));
     }
 
     @PostMapping("/login")
-    @Operation(
-            summary = "고객 로그인",
-            description = "고객 아이디와 비밀번호를 확인합니다."
-    )
-    public ResponseEntity<CustomerDto> loginCustomer(
+    @Operation(summary = "고객 로그인", description = "고객 아이디와 비밀번호를 확인합니다.")
+    public ResponseEntity<CustomerResponse> loginCustomer(
             @Valid @RequestBody LoginRequest request
     ) {
-        CustomerDto customer = customerService.loginCustomer(
-                request.customerId(),
-                request.customerPassword()
-        );
-        return ResponseEntity.ok(customer);
+        return ResponseEntity.ok(customerService.loginCustomer(
+                request.customerId(), request.customerPassword()
+        ));
     }
 
     @PutMapping("/{customerId}")
-    @Operation(
-            summary = "고객 정보 수정",
-            description = "고객의 비밀번호와 포인트 정보를 수정합니다."
-    )
-    public ResponseEntity<CustomerDto> updateCustomer(
+    @Operation(summary = "고객 정보 수정", description = "고객 비밀번호를 수정합니다.")
+    public ResponseEntity<CustomerResponse> updateCustomer(
             @PathVariable String customerId,
-            @RequestBody CustomerDto customerDto
+            @Valid @RequestBody UpdateCustomerRequest request
     ) {
-        CustomerDto updatedCustomer =
-                customerService.updateCustomer(customerId, customerDto);
-        return ResponseEntity.ok(updatedCustomer);
+        return ResponseEntity.ok(
+                customerService.updateCustomer(customerId, request)
+        );
     }
 
     @DeleteMapping("/{customerId}")
-    @Operation(
-            summary = "고객 삭제",
-            description = "고객과 해당 고객의 주문 정보를 삭제합니다."
-    )
+    @Operation(summary = "고객 삭제", description = "고객과 관련 정보를 삭제합니다.")
     public ResponseEntity<Void> deleteCustomer(
             @PathVariable String customerId
     ) {
         customerService.deleteCustomer(customerId);
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/{customerId}/check-in")
-    @Operation(summary = "일일 출석 체크", description = "하루 한 번 1,000포인트를 지급합니다.")
-    public ResponseEntity<CheckInResponse> checkIn(
-            @PathVariable String customerId
-    ) {
-        return ResponseEntity.ok(customerService.checkIn(customerId));
-    }
-
-    @PostMapping("/{customerId}/favorites/{productId}")
-    @Operation(summary = "상품 찜하기", description = "고객의 찜 목록에 상품을 추가합니다.")
-    public ResponseEntity<FavoriteDto> addFavorite(
-            @PathVariable String customerId,
-            @PathVariable Long productId
-    ) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(customerService.addFavorite(customerId, productId));
-    }
-
-    @GetMapping("/{customerId}/favorites")
-    @Operation(summary = "찜 목록 조회", description = "고객이 찜한 상품 목록을 조회합니다.")
-    public ResponseEntity<List<FavoriteDto>> getFavorites(
-            @PathVariable String customerId
-    ) {
-        return ResponseEntity.ok(customerService.getFavorites(customerId));
-    }
-
-    @DeleteMapping("/{customerId}/favorites/{productId}")
-    @Operation(summary = "상품 찜 취소", description = "고객의 찜 목록에서 상품을 삭제합니다.")
-    public ResponseEntity<Void> deleteFavorite(
-            @PathVariable String customerId,
-            @PathVariable Long productId
-    ) {
-        customerService.deleteFavorite(customerId, productId);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/order")
-    @Operation(
-            summary = "고객 상품 주문",
-            description = "고객이 상품을 주문하고 포인트를 차감합니다."
-    )
-    public ResponseEntity<OrderListDto> placeOrder(
-            @Valid @RequestBody OrderRequest request
-    ) {
-        OrderListDto order = customerService.placeOrder(
-                request.customerId(),
-                request.productId(),
-                request.quantity()
-        );
-        return ResponseEntity.status(HttpStatus.CREATED).body(order);
-    }
-
-    @PostMapping("/cancel")
-    @Operation(
-            summary = "고객 주문 취소",
-            description = "주문 상품 수량을 취소하고 포인트를 환급합니다."
-    )
-    public ResponseEntity<OrderListDto> cancelOrder(
-            @Valid @RequestBody OrderRequest request
-    ) {
-        OrderListDto order = customerService.cancelOrder(
-                request.customerId(),
-                request.productId(),
-                request.quantity()
-        );
-        return ResponseEntity.ok(order);
     }
 }

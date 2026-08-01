@@ -9,8 +9,7 @@ import com.sk.skala.shopapi.entity.Customer;
 import com.sk.skala.shopapi.entity.OrderItem;
 import com.sk.skala.shopapi.entity.Product;
 
-public interface CustomerProductRepository extends JpaRepository<OrderItem, Long> {
-
+public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     List<OrderItem> findByCustomerCustomerId(String customerId);
 
     Optional<OrderItem> findByCustomerAndProduct(

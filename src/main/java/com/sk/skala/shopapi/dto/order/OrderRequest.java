@@ -1,4 +1,4 @@
-package com.sk.skala.shopapi.dto;
+package com.sk.skala.shopapi.dto.order;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

@@ -5,7 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sk.skala.shopapi.dto.ProductDto;
+import com.sk.skala.shopapi.dto.product.ProductRequest;
+import com.sk.skala.shopapi.dto.product.ProductResponse;
 import com.sk.skala.shopapi.entity.Product;
 import com.sk.skala.shopapi.exception.DataNotFoundException;
 import com.sk.skala.shopapi.repository.ProductRepository;
@@ -21,7 +22,7 @@ public class ProductService {
     private final FavoriteRepository favoriteRepository;
 
     // 1. 전체 상품 목록 조회
-    public List<ProductDto> getAllProduct() {
+    public List<ProductResponse> getAllProduct() {
         return productRepository.findAll()
                 .stream()
                 .map(this::convertToDto)
@@ -29,17 +30,17 @@ public class ProductService {
     }
 
     // 2. 개별 상품 상세 조회
-    public ProductDto getProductById(Long id) {
+    public ProductResponse getProductById(Long id) {
         Product product = findProductById(id);
         return convertToDto(product);
     }
 
     // 3. 상품 등록
     @Transactional
-    public ProductDto createProduct(ProductDto productDto) {
+    public ProductResponse createProduct(ProductRequest request) {
         Product product = Product.builder()
-                .productName(productDto.getProductName())
-                .productPrice(productDto.getProductPrice())
+                .productName(request.productName())
+                .productPrice(request.productPrice())
                 .build();
 
         Product savedProduct = productRepository.save(product);
@@ -48,14 +49,14 @@ public class ProductService {
 
     // 4. 상품 정보 수정
     @Transactional
-    public ProductDto updateProduct(
+    public ProductResponse updateProduct(
             Long id,
-            ProductDto productDto
+            ProductRequest request
     ) {
         Product product = findProductById(id);
 
-        product.setProductName(productDto.getProductName());
-        product.setProductPrice(productDto.getProductPrice());
+        product.setProductName(request.productName());
+        product.setProductPrice(request.productPrice());
 
         Product updatedProduct = productRepository.save(product);
         return convertToDto(updatedProduct);
@@ -81,11 +82,11 @@ public class ProductService {
                 );
     }
 
-    private ProductDto convertToDto(Product product) {
-        return ProductDto.builder()
-                .id(product.getId())
-                .productName(product.getProductName())
-                .productPrice(product.getProductPrice())
-                .build();
+    private ProductResponse convertToDto(Product product) {
+        return new ProductResponse(
+                product.getId(),
+                product.getProductName(),
+                product.getProductPrice()
+        );
     }
 }

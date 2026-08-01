@@ -1,6 +1,6 @@
-package com.sk.skala.shopapi.dto;
+package com.sk.skala.shopapi.dto.favorite;
 
-public record FavoriteDto(
+public record FavoriteResponse(
         Long productId,
         String productName,
         Double productPrice

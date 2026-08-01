@@ -7,45 +7,53 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sk.skala.shopapi.dto.CheckInResponse;
+import com.sk.skala.shopapi.dto.reward.CheckInResponse;
 import com.sk.skala.shopapi.exception.DuplicateFavoriteException;
 import com.sk.skala.shopapi.exception.RewardAlreadyReceivedException;
-import com.sk.skala.shopapi.service.CustomerService;
+import com.sk.skala.shopapi.repository.CustomerRepository;
+import com.sk.skala.shopapi.service.FavoriteService;
+import com.sk.skala.shopapi.service.RewardService;
 
 @SpringBootTest
 @Transactional
 class CustomerFeatureTests {
 
     @Autowired
-    private CustomerService customerService;
+    private RewardService rewardService;
+
+    @Autowired
+    private FavoriteService favoriteService;
+
+    @Autowired
+    private CustomerRepository customerRepository;
 
     @Test
     void 출석체크는_하루에_한번만_포인트를_지급한다() {
-        double beforePoint = customerService
-                .getCustomerById("customer1")
+        double beforePoint = customerRepository.findById("customer1")
+                .orElseThrow()
                 .getCustomerPoint();
 
-        CheckInResponse response = customerService.checkIn("customer1");
+        CheckInResponse response = rewardService.checkIn("customer1");
 
         assertEquals(1000.0, response.rewardPoint());
         assertEquals(beforePoint + 1000.0, response.customerPoint());
         assertThrows(
                 RewardAlreadyReceivedException.class,
-                () -> customerService.checkIn("customer1")
+                () -> rewardService.checkIn("customer1")
         );
     }
 
     @Test
     void 찜한_상품을_추가하고_삭제할_수_있다() {
-        customerService.addFavorite("customer1", 1L);
+        favoriteService.addFavorite("customer1", 1L);
 
-        assertEquals(1, customerService.getFavorites("customer1").size());
+        assertEquals(1, favoriteService.getFavorites("customer1").size());
         assertThrows(
                 DuplicateFavoriteException.class,
-                () -> customerService.addFavorite("customer1", 1L)
+                () -> favoriteService.addFavorite("customer1", 1L)
         );
 
-        customerService.deleteFavorite("customer1", 1L);
-        assertTrue(customerService.getFavorites("customer1").isEmpty());
+        favoriteService.deleteFavorite("customer1", 1L);
+        assertTrue(favoriteService.getFavorites("customer1").isEmpty());
     }
 }
