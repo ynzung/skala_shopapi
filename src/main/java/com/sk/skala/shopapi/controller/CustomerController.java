@@ -52,23 +52,21 @@ public class CustomerController {
         return ResponseEntity.ok(authService.login(request));
     }
 
-    @PutMapping("/{customerId}")
-    @Operation(summary = "고객 정보 수정", description = "고객 비밀번호를 수정합니다.")
+    @PutMapping("/me")
+    @Operation(summary = "내 정보 수정", description = "로그인한 고객의 비밀번호를 수정합니다.")
     public ResponseEntity<CustomerResponse> updateCustomer(
-            @PathVariable String customerId,
+            Principal principal,
             @Valid @RequestBody UpdateCustomerRequest request
     ) {
         return ResponseEntity.ok(
-                customerService.updateCustomer(customerId, request)
+                customerService.updateCustomer(principal.getName(), request)
         );
     }
 
-    @DeleteMapping("/{customerId}")
-    @Operation(summary = "고객 삭제", description = "고객과 관련 정보를 삭제합니다.")
-    public ResponseEntity<Void> deleteCustomer(
-            @PathVariable String customerId
-    ) {
-        customerService.deleteCustomer(customerId);
+    @DeleteMapping("/me")
+    @Operation(summary = "회원 탈퇴", description = "로그인한 고객과 관련 정보를 삭제합니다.")
+    public ResponseEntity<Void> deleteCustomer(Principal principal) {
+        customerService.deleteCustomer(principal.getName());
         return ResponseEntity.noContent().build();
     }
 }

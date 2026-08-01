@@ -1,5 +1,7 @@
 package com.sk.skala.shopapi.controller;
 
+import java.security.Principal;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +19,11 @@ import lombok.RequiredArgsConstructor;
 public class RewardController {
     private final RewardService rewardService;
 
-    @PostMapping("/{customerId}/check-in")
+    @PostMapping("/me/check-in")
     @Operation(summary = "일일 출석 체크", description = "하루 한 번 1,000포인트를 지급합니다.")
     public ResponseEntity<CheckInResponse> checkIn(
-            @PathVariable String customerId
+            Principal principal
     ) {
-        return ResponseEntity.ok(rewardService.checkIn(customerId));
+        return ResponseEntity.ok(rewardService.checkIn(principal.getName()));
     }
 }

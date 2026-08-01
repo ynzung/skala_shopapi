@@ -1,5 +1,6 @@
 package com.sk.skala.shopapi.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -23,29 +24,34 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
     private final OrderService orderService;
 
-    @GetMapping("/{customerId}")
-    @Operation(summary = "고객 주문 상세 조회", description = "고객 정보와 주문 상품 목록을 조회합니다.")
+    @GetMapping("/me")
+    @Operation(summary = "내 주문 상세 조회", description = "로그인한 고객 정보와 주문 상품 목록을 조회합니다.")
     public ResponseEntity<OrderListResponse> getCustomerById(
-            @PathVariable String customerId
+            Principal principal
     ) {
-        return ResponseEntity.ok(orderService.getCustomerOrderList(customerId));
+        return ResponseEntity.ok(
+                orderService.getCustomerOrderList(principal.getName())
+        );
     }
 
-    @GetMapping("/{customerId}/products")
-    @Operation(summary = "고객 주문 상품 조회", description = "고객이 주문한 상품 목록을 조회합니다.")
+    @GetMapping("/me/products")
+    @Operation(summary = "내 주문 상품 조회", description = "로그인한 고객의 주문 상품 목록을 조회합니다.")
     public ResponseEntity<List<OrderItemResponse>> getCustomerProducts(
-            @PathVariable String customerId
+            Principal principal
     ) {
-        return ResponseEntity.ok(orderService.getCustomerProducts(customerId));
+        return ResponseEntity.ok(
+                orderService.getCustomerProducts(principal.getName())
+        );
     }
 
     @PostMapping("/order")
     @Operation(summary = "상품 주문", description = "상품을 주문하고 고객 포인트를 차감합니다.")
     public ResponseEntity<OrderListResponse> placeOrder(
+            Principal principal,
             @Valid @RequestBody OrderRequest request
     ) {
         OrderListResponse order = orderService.placeOrder(
-                request.customerId(), request.productId(), request.quantity()
+                principal.getName(), request.productId(), request.quantity()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
@@ -53,10 +59,11 @@ public class OrderController {
     @PostMapping("/cancel")
     @Operation(summary = "주문 취소", description = "주문 수량을 차감하고 포인트를 환급합니다.")
     public ResponseEntity<OrderListResponse> cancelOrder(
+            Principal principal,
             @Valid @RequestBody OrderRequest request
     ) {
         return ResponseEntity.ok(orderService.cancelOrder(
-                request.customerId(), request.productId(), request.quantity()
+                principal.getName(), request.productId(), request.quantity()
         ));
     }
 }

@@ -1,5 +1,6 @@
 package com.sk.skala.shopapi.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -19,22 +20,24 @@ import lombok.RequiredArgsConstructor;
 public class FavoriteController {
     private final FavoriteService favoriteService;
 
-    @PostMapping("/{customerId}/favorites/{productId}")
+    @PostMapping("/favorites/{productId}")
     @Operation(summary = "상품 찜 상태 변경", description = "호출할 때마다 상품의 찜 상태를 반전합니다.")
     public ResponseEntity<FavoriteResponse> toggleFavorite(
-            @PathVariable String customerId,
+            Principal principal,
             @PathVariable Long productId
     ) {
         return ResponseEntity.ok(
-                favoriteService.toggleFavorite(customerId, productId)
+                favoriteService.toggleFavorite(principal.getName(), productId)
         );
     }
 
-    @GetMapping("/{customerId}/favorites")
+    @GetMapping("/favorites")
     @Operation(summary = "찜 목록 조회", description = "고객이 찜한 상품 목록을 조회합니다.")
     public ResponseEntity<List<FavoriteResponse>> getFavorites(
-            @PathVariable String customerId
+            Principal principal
     ) {
-        return ResponseEntity.ok(favoriteService.getFavorites(customerId));
+        return ResponseEntity.ok(
+                favoriteService.getFavorites(principal.getName())
+        );
     }
 }
