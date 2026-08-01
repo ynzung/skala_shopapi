@@ -13,6 +13,7 @@ import com.sk.skala.shopapi.dto.LoginRequest;
 import com.sk.skala.shopapi.dto.OrderItemDto;
 import com.sk.skala.shopapi.dto.OrderListDto;
 import com.sk.skala.shopapi.dto.OrderRequest;
+import com.sk.skala.shopapi.dto.SignupResponse;
 import com.sk.skala.shopapi.service.CustomerService;
 
 import java.util.List;
@@ -65,14 +66,14 @@ public class CustomerController {
             summary = "고객 회원가입",
             description = "새로운 고객을 등록합니다."
     )
-    public ResponseEntity<CustomerDto> createCustomer(
+    public ResponseEntity<SignupResponse> createCustomer(
             @RequestBody CustomerDto customerDto
     ) {
-        CustomerDto createdCustomer =
+        SignupResponse response =
                 customerService.createCustomer(customerDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(createdCustomer);
+                .body(response);
     }
 
     @PostMapping("/login")
