@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sk.skala.shopapi.dto.CustomerDto;
 import com.sk.skala.shopapi.dto.OrderItemDto;
 import com.sk.skala.shopapi.dto.OrderListDto;
+import com.sk.skala.shopapi.dto.SignupResponse;
 import com.sk.skala.shopapi.entity.Customer;
 import com.sk.skala.shopapi.entity.OrderItem;
 import com.sk.skala.shopapi.entity.Product;
@@ -25,6 +26,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CustomerService {
+
+    private static final double SIGNUP_BONUS_POINT = 3000.0;
 
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
@@ -68,10 +71,14 @@ public class CustomerService {
         Customer customer = Customer.builder()
                 .customerId(customerDto.getCustomerId())
                 .customerPassword(customerDto.getCustomerPassword())
-                .customerPoint(customerDto.getCustomerPoint())
+                .customerPoint(SIGNUP_BONUS_POINT)
                 .build();
 
-        return convertToDto(customerRepository.save(customer));
+        customerRepository.save(customer);
+        return new SignupResponse(
+                "회원가입에 성공했습니다.",
+                SIGNUP_BONUS_POINT
+        );
     }
 
     // 4. 고객 로그인
