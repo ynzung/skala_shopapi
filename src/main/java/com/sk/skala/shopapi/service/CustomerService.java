@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.sk.skala.shopapi.dto.customer.CustomerResponse;
 import com.sk.skala.shopapi.dto.customer.SignupRequest;
@@ -30,6 +31,7 @@ public class CustomerService {
     private final OrderItemRepository orderItemRepository;
     private final DailyCheckInRepository dailyCheckInRepository;
     private final FavoriteRepository favoriteRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<CustomerResponse> getAllCustomer() {
         return customerRepository.findAll()
@@ -49,7 +51,7 @@ public class CustomerService {
 
         Customer customer = Customer.builder()
                 .customerId(request.customerId())
-                .customerPassword(request.customerPassword())
+                .customerPassword(passwordEncoder.encode(request.customerPassword()))
                 .customerPoint(SIGNUP_BONUS_POINT)
                 .build();
         customerRepository.save(customer);
@@ -60,22 +62,13 @@ public class CustomerService {
         );
     }
 
-    public CustomerResponse loginCustomer(String customerId, String customerPassword) {
-        Customer customer = findCustomerById(customerId);
-
-        if (!customer.getCustomerPassword().equals(customerPassword)) {
-            throw new RuntimeException("아이디 또는 비밀번호가 일치하지 않습니다.");
-        }
-        return convertToDto(customer);
-    }
-
     @Transactional
     public CustomerResponse updateCustomer(
             String customerId,
             UpdateCustomerRequest request
     ) {
         Customer customer = findCustomerById(customerId);
-        customer.setCustomerPassword(request.customerPassword());
+        customer.setCustomerPassword(passwordEncoder.encode(request.customerPassword()));
         return convertToDto(customerRepository.save(customer));
     }
 

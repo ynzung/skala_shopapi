@@ -6,10 +6,10 @@ INSERT INTO products (product_name, product_price) VALUES ('디지털 카메라'
 INSERT INTO products (product_name, product_price) VALUES ('노트북', 12000);
 
 INSERT INTO customers (customer_id, customer_password, customer_point)
-VALUES ('customer1', 'password1', 100000);
+VALUES ('customer1', '{noop}password1', 100000);
 
 INSERT INTO customers (customer_id, customer_password, customer_point)
-VALUES ('customer2', 'password2', 75000);
+VALUES ('customer2', '{noop}password2', 75000);
 
 INSERT INTO customers (customer_id, customer_password, customer_point)
-VALUES ('customer3', 'password3', 50000);
+VALUES ('customer3', '{noop}password3', 50000);
