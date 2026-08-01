@@ -769,7 +769,10 @@
 
     <script>
       const state = {
-        customerId: localStorage.getItem("shopCustomerId"),
+        customerId: localStorage.getItem("shopAccessToken")
+          ? localStorage.getItem("shopCustomerId")
+          : null,
+        accessToken: localStorage.getItem("shopAccessToken"),
         point: null,
         products: [],
         favorites: new Set(),
@@ -798,6 +801,9 @@
           ...options,
           headers: {
             "Content-Type": "application/json",
+            ...(state.accessToken
+              ? { Authorization: `Bearer ${state.accessToken}` }
+              : {}),
             ...(options.headers || {}),
           },
         });
@@ -817,7 +823,12 @@
         const el = openDialog?.querySelector(".dialog-toast") || $("#toast");
         document
           .querySelectorAll(".toast")
-          .forEach((item) => (item.className = item.classList.contains("dialog-toast") ? "toast dialog-toast" : "toast"));
+          .forEach(
+            (item) =>
+              (item.className = item.classList.contains("dialog-toast")
+                ? "toast dialog-toast"
+                : "toast"),
+          );
         el.textContent = message;
         el.className = `${el.classList.contains("dialog-toast") ? "toast dialog-toast" : "toast"} show${error ? " error" : ""}`;
         clearTimeout(toast.timer);
@@ -837,10 +848,15 @@
 
       function setSession(customer) {
         state.customerId = customer?.customerId || null;
+        state.accessToken = customer?.accessToken || null;
         state.point = customer?.customerPoint ?? null;
-        if (state.customerId)
+        if (state.customerId) {
           localStorage.setItem("shopCustomerId", state.customerId);
-        else localStorage.removeItem("shopCustomerId");
+          localStorage.setItem("shopAccessToken", state.accessToken);
+        } else {
+          localStorage.removeItem("shopCustomerId");
+          localStorage.removeItem("shopAccessToken");
+        }
         renderSession();
       }
 
@@ -918,9 +934,7 @@
       async function loadCustomer() {
         if (!state.customerId) return;
         try {
-          const data = await api(
-            `/api/customers/${encodeURIComponent(state.customerId)}`,
-          );
+          const data = await api("/api/customers/me");
           state.point = data.customerPoint;
           renderSession();
           await loadFavorites(false);
@@ -933,9 +947,7 @@
       async function loadFavorites(render = true) {
         if (!requireLogin()) return;
         try {
-          const favorites = await api(
-            `/api/customers/${encodeURIComponent(state.customerId)}/favorites`,
-          );
+          const favorites = await api("/api/customers/favorites");
           state.favorites = new Set(favorites.map((item) => item.productId));
           renderProducts();
           if (render) {
@@ -954,10 +966,9 @@
       async function toggleFavorite(productId) {
         if (!requireLogin()) return;
         try {
-          const result = await api(
-            `/api/customers/${encodeURIComponent(state.customerId)}/favorites/${productId}`,
-            { method: "POST" },
-          );
+          const result = await api(`/api/customers/favorites/${productId}`, {
+            method: "POST",
+          });
           result.favorite
             ? state.favorites.add(productId)
             : state.favorites.delete(productId);
@@ -977,7 +988,6 @@
           const result = await api("/api/customers/order", {
             method: "POST",
             body: JSON.stringify({
-              customerId: state.customerId,
               productId,
               quantity,
             }),
@@ -997,9 +1007,7 @@
       async function loadOrders() {
         if (!requireLogin()) return;
         try {
-          const data = await api(
-            `/api/customers/${encodeURIComponent(state.customerId)}`,
-          );
+          const data = await api("/api/customers/me");
           state.point = data.customerPoint;
           renderSession();
           $("#orderList").innerHTML = data.products.length
@@ -1028,7 +1036,6 @@
           const result = await api("/api/customers/cancel", {
             method: "POST",
             body: JSON.stringify({
-              customerId: state.customerId,
               productId,
               quantity,
             }),
@@ -1045,10 +1052,9 @@
       async function checkIn() {
         if (!requireLogin()) return;
         try {
-          const result = await api(
-            `/api/customers/${encodeURIComponent(state.customerId)}/check-in`,
-            { method: "POST" },
-          );
+          const result = await api("/api/customers/me/check-in", {
+            method: "POST",
+          });
           state.point = result.customerPoint;
           renderSession();
           toast(`${result.message} +${won(result.rewardPoint)}P`);
