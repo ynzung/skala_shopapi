@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sk.skala.shopapi.dto.ProductDto;
 import com.sk.skala.shopapi.entity.Product;
+import com.sk.skala.shopapi.exception.DataNotFoundException;
 import com.sk.skala.shopapi.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -62,7 +63,7 @@ public class ProductService {
     @Transactional
     public void deleteProduct(Long id) {
         if (!productRepository.existsById(id)) {
-            throw new RuntimeException("상품을 찾을 수 없습니다: " + id);
+            throw new DataNotFoundException("상품을 찾을 수 없습니다: " + id);
         }
 
         productRepository.deleteById(id);
@@ -71,7 +72,7 @@ public class ProductService {
     private Product findProductById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(
-                        () -> new RuntimeException(
+                        () -> new DataNotFoundException(
                                 "상품을 찾을 수 없습니다: " + id
                         )
                 );

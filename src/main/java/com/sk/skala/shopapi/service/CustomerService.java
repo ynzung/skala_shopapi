@@ -11,6 +11,10 @@ import com.sk.skala.shopapi.dto.OrderListDto;
 import com.sk.skala.shopapi.entity.Customer;
 import com.sk.skala.shopapi.entity.OrderItem;
 import com.sk.skala.shopapi.entity.Product;
+import com.sk.skala.shopapi.exception.DataNotFoundException;
+import com.sk.skala.shopapi.exception.DuplicateCustomerException;
+import com.sk.skala.shopapi.exception.InsufficientFundsException;
+import com.sk.skala.shopapi.exception.ParameterException;
 import com.sk.skala.shopapi.repository.CustomerProductRepository;
 import com.sk.skala.shopapi.repository.CustomerRepository;
 import com.sk.skala.shopapi.repository.ProductRepository;
@@ -53,9 +57,9 @@ public class CustomerService {
 
     // 3. 고객 생성
     @Transactional
-    public CustomerDto createCustomer(CustomerDto customerDto) {
+    public SignupResponse createCustomer(CustomerDto customerDto) {
         if (customerRepository.existsById(customerDto.getCustomerId())) {
-            throw new RuntimeException(
+            throw new DuplicateCustomerException(
                     "이미 존재하는 고객 아이디입니다: "
                             + customerDto.getCustomerId()
             );
@@ -130,7 +134,7 @@ public class CustomerService {
         double orderPrice = product.getProductPrice() * quantity;
 
         if (customer.getCustomerPoint() < orderPrice) {
-            throw new RuntimeException("고객 포인트가 부족합니다.");
+            throw new InsufficientFundsException("고객 포인트가 부족합니다.");
         }
 
         OrderItem orderItem = customerProductRepository
@@ -166,13 +170,13 @@ public class CustomerService {
         OrderItem orderItem = customerProductRepository
                 .findByCustomerAndProduct(customer, product)
                 .orElseThrow(
-                        () -> new RuntimeException(
+                        () -> new DataNotFoundException(
                                 "취소할 주문 상품을 찾을 수 없습니다."
                         )
                 );
 
         if (orderItem.getQuantity() < quantity) {
-            throw new RuntimeException("보유 수량보다 많이 취소할 수 없습니다.");
+            throw new ParameterException("보유 수량보다 많이 취소할 수 없습니다.");
         }
 
         int remainingQuantity = orderItem.getQuantity() - quantity;
@@ -195,7 +199,7 @@ public class CustomerService {
     private Customer findCustomerById(String customerId) {
         return customerRepository.findById(customerId)
                 .orElseThrow(
-                        () -> new RuntimeException(
+                        () -> new DataNotFoundException(
                                 "고객을 찾을 수 없습니다: " + customerId
                         )
                 );
@@ -204,7 +208,7 @@ public class CustomerService {
     private Product findProductById(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(
-                        () -> new RuntimeException(
+                        () -> new DataNotFoundException(
                                 "상품을 찾을 수 없습니다: " + productId
                         )
                 );
@@ -212,7 +216,7 @@ public class CustomerService {
 
     private void validateQuantity(int quantity) {
         if (quantity <= 0) {
-            throw new IllegalArgumentException(
+            throw new ParameterException(
                     "상품 수량은 1 이상이어야 합니다."
             );
         }
