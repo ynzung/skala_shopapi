@@ -1,0 +1,1228 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="포인트로 쇼핑하고 매일 혜택을 받는 SKALA Shop"
+    />
+    <title>SKALA Shop</title>
+    <style>
+      :root {
+        --ink: #171629;
+        --muted: #747b83;
+        --paper: #ffffff;
+        --card: #ffffff;
+        --line: #e5e3ee;
+        --coral: #51459d;
+        --green: #51459d;
+        --yellow: #6d60bc;
+        --lavender: #f1effd;
+        --shadow: 0 12px 34px rgba(55, 47, 112, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: var(--paper);
+        font-family:
+          Pretendard,
+          "Noto Sans KR",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      .shell {
+        width: min(1180px, calc(100% - 36px));
+        margin: 0 auto;
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-bottom: 1px solid rgba(222, 217, 205, 0.8);
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(14px);
+      }
+      .topbar {
+        height: 72px;
+        display: flex;
+        align-items: center;
+        gap: 28px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 900;
+        font-size: 20px;
+        letter-spacing: -0.5px;
+      }
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border-radius: 11px;
+        background: var(--ink);
+        color: white;
+        transform: rotate(-4deg);
+      }
+      nav {
+        display: flex;
+        gap: 4px;
+        flex: 1;
+      }
+      .nav-btn {
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        padding: 10px 13px;
+        border-radius: 10px;
+        font-weight: 700;
+      }
+      .nav-btn.active,
+      .nav-btn:hover {
+        color: var(--ink);
+        background: white;
+      }
+      .session-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .btn {
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 10px 15px;
+        background: white;
+        color: var(--ink);
+        font-weight: 800;
+        transition: 0.18s ease;
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 7px 18px rgba(23, 35, 60, 0.08);
+      }
+      .btn.primary {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: white;
+      }
+      .btn.coral {
+        background: var(--coral);
+        border-color: var(--coral);
+        color: white;
+      }
+      .btn.ghost {
+        background: transparent;
+      }
+      .btn.danger {
+        color: #b83f32;
+        border-color: #e6b7b1;
+      }
+      .btn.small {
+        padding: 8px 11px;
+        font-size: 13px;
+      }
+
+      main {
+        padding: 30px 0 70px;
+      }
+      .login-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 38px;
+        padding: 18px 22px 18px 28px;
+        border: 1px solid #d9d4f4;
+        border-radius: 16px;
+        background: var(--lavender);
+        color: #4c4395;
+        font-weight: 800;
+      }
+      .view {
+        display: none;
+      }
+      .view.active {
+        display: block;
+        animation: enter 0.28s ease;
+      }
+      @keyframes enter {
+        from {
+          opacity: 0;
+          transform: translateY(7px);
+        }
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.55fr 0.75fr;
+        gap: 22px;
+        margin-bottom: 34px;
+      }
+      .hero-main {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        min-height: 270px;
+        padding: 36px 38px;
+        border: 1px solid #e1ddf5;
+        border-radius: 20px;
+        background: #f8f7fe;
+        color: var(--ink);
+        box-shadow: none;
+      }
+      .hero-main::after {
+        display: none;
+      }
+      .hero-main > * {
+        position: relative;
+        z-index: 1;
+      }
+      .eyebrow {
+        margin: 0 0 14px;
+        color: #7b8586;
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: -0.2px;
+        text-transform: none;
+      }
+      h1 {
+        max-width: 600px;
+        margin: 0;
+        font-size: clamp(38px, 5vw, 56px);
+        line-height: 1.08;
+        letter-spacing: -2.8px;
+      }
+      .hero-copy {
+        max-width: none;
+        margin: 22px 0 28px;
+        color: #51459d;
+        font-size: clamp(14px, 1.25vw, 18px);
+        font-weight: 750;
+        line-height: 1.7;
+        white-space: nowrap;
+        word-break: keep-all;
+      }
+      .hero .btn {
+        position: relative;
+      }
+      .point-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: #f8f7fe;
+        box-shadow: var(--shadow);
+      }
+      .point-card .label {
+        color: var(--muted);
+        font-weight: 700;
+      }
+      .point-value {
+        margin: 12px 0;
+        font-size: 42px;
+        font-weight: 900;
+        letter-spacing: -2px;
+      }
+      .point-value small {
+        font-size: 17px;
+        letter-spacing: 0;
+      }
+      .checkin-note {
+        color: var(--green);
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 18px;
+        margin: 30px 0 18px;
+      }
+      h2 {
+        margin: 0;
+        font-size: 28px;
+        letter-spacing: -1.2px;
+      }
+      .section-head p {
+        margin: 7px 0 0;
+        color: var(--muted);
+      }
+      .search {
+        width: min(330px, 100%);
+        padding: 12px 15px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: white;
+        outline: none;
+      }
+      .search:focus,
+      input:focus {
+        border-color: var(--green);
+        box-shadow: 0 0 0 3px rgba(40, 124, 103, 0.12);
+      }
+
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .product {
+        min-width: 0;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--card);
+        transition: 0.2s ease;
+      }
+      .product:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow);
+      }
+      .product-visual {
+        height: 150px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 18px;
+        border-radius: 15px;
+        background: #f1effd;
+        color: var(--ink);
+        font-size: 52px;
+      }
+      .product:nth-child(3n + 2) .product-visual {
+        background: #eff5ff;
+      }
+      .product:nth-child(3n) .product-visual {
+        background: #faf0f7;
+      }
+      .product-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .product h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+      .price {
+        font-size: 20px;
+        font-weight: 900;
+      }
+      .heart {
+        width: 38px;
+        height: 38px;
+        border: 1px solid var(--line);
+        border-radius: 50%;
+        background: white;
+        font-size: 18px;
+      }
+      .heart.on {
+        color: #51459d;
+        background: #eeebff;
+        border-color: #cfc8f2;
+      }
+      .buy-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 18px;
+      }
+      .qty {
+        width: 60px;
+        padding: 9px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: white;
+      }
+      .buy-row .btn {
+        flex: 1;
+      }
+
+      .panel {
+        padding: 26px;
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+      .order-list {
+        display: grid;
+        gap: 12px;
+        margin-top: 20px;
+      }
+      .order-row {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        gap: 16px;
+        align-items: center;
+        padding: 17px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: white;
+      }
+      .order-row strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+      .order-row span {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .account-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      .form {
+        display: grid;
+        gap: 12px;
+      }
+      .form label {
+        display: grid;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 800;
+      }
+      .form input {
+        width: 100%;
+        padding: 12px 13px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: white;
+        outline: none;
+      }
+      .form-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .admin-products {
+        margin-top: 18px;
+        display: grid;
+        gap: 10px;
+      }
+      .admin-row {
+        display: grid;
+        grid-template-columns: 1fr 120px auto;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .empty {
+        padding: 45px 20px;
+        border: 1px dashed #c9c2b5;
+        border-radius: 18px;
+        text-align: center;
+        color: var(--muted);
+      }
+      .toast {
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        max-width: 360px;
+        padding: 14px 17px;
+        border-radius: 13px;
+        background: var(--ink);
+        color: white;
+        box-shadow: var(--shadow);
+        transform: translateY(90px);
+        opacity: 0;
+        transition: 0.25s ease;
+        z-index: 50;
+      }
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .toast.error {
+        background: #a83f35;
+      }
+      .dialog-toast {
+        position: absolute;
+        inset: calc(100% + 12px) 0 auto 0;
+        width: 100%;
+        max-width: none;
+        margin: auto;
+        z-index: 10;
+      }
+      dialog {
+        width: min(440px, calc(100% - 30px));
+        padding: 0;
+        border: 0;
+        border-radius: 22px;
+        overflow: visible;
+        box-shadow: 0 30px 90px rgba(23, 35, 60, 0.28);
+      }
+      dialog::backdrop {
+        background: rgba(23, 35, 60, 0.48);
+        backdrop-filter: blur(4px);
+      }
+      .dialog-body {
+        padding: 28px;
+      }
+      .dialog-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 22px;
+      }
+      .dialog-head h2 {
+        font-size: 24px;
+      }
+      .close {
+        border: 0;
+        background: transparent;
+        font-size: 24px;
+        color: var(--muted);
+      }
+      .tabs {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 18px;
+        padding: 4px;
+        border-radius: 12px;
+        background: #efebe2;
+      }
+      .tab {
+        flex: 1;
+        padding: 9px;
+        border: 0;
+        border-radius: 9px;
+        background: transparent;
+        font-weight: 800;
+      }
+      .tab.active {
+        background: white;
+      }
+
+      @media (max-width: 860px) {
+        .hero,
+        .account-grid {
+          grid-template-columns: 1fr;
+        }
+        .hero-copy {
+          white-space: normal;
+          word-break: keep-all;
+        }
+        .product-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .section-head {
+          align-items: stretch;
+          flex-direction: column;
+        }
+        .search {
+          width: 100%;
+        }
+        nav {
+          display: none;
+        }
+        .brand {
+          flex: 1;
+        }
+        .point-card {
+          gap: 12px;
+        }
+      }
+      @media (max-width: 560px) {
+        .shell {
+          width: min(100% - 24px, 1180px);
+        }
+        .topbar {
+          height: 64px;
+        }
+        .session-actions .btn.ghost {
+          display: none;
+        }
+        main {
+          padding-top: 20px;
+        }
+        .login-banner {
+          align-items: stretch;
+          flex-direction: column;
+          margin-bottom: 24px;
+          padding: 18px;
+          line-height: 1.55;
+        }
+        .hero-main {
+          min-height: 290px;
+          padding: 30px 24px;
+        }
+        h1 {
+          letter-spacing: -2px;
+        }
+        .product-grid {
+          grid-template-columns: 1fr;
+        }
+        .order-row {
+          grid-template-columns: 1fr auto;
+        }
+        .order-row .btn {
+          grid-column: 1 / -1;
+        }
+        .admin-row {
+          grid-template-columns: 1fr;
+          padding-bottom: 14px;
+          border-bottom: 1px solid var(--line);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="shell topbar">
+        <div class="brand"><span class="brand-mark">S</span> SKALA Shop</div>
+        <nav aria-label="주요 메뉴">
+          <button class="nav-btn active" data-view="shop">쇼핑</button>
+          <button class="nav-btn" data-view="orders">내 주문</button>
+          <button class="nav-btn" data-view="favorites">찜 목록</button>
+          <button class="nav-btn" data-view="admin">상품 관리</button>
+        </nav>
+        <div class="session-actions">
+          <button class="btn ghost" id="userLabel" hidden></button>
+          <button class="btn primary" id="authButton">로그인</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="shell">
+      <section class="view active" id="shopView">
+        <div class="login-banner" id="loginBanner">
+          <span
+            >👋 SKALA 회원이신가요? 로그인하면 주문·찜·출석 기능을 모두 이용할
+            수 있어요.</span
+          >
+          <button class="btn primary" id="bannerAuth">로그인</button>
+        </div>
+        <div class="hero">
+          <div class="hero-main">
+            <p class="eyebrow">SKALA 교육생을 위한 포인트 쇼핑 서비스</p>
+            <h1>SKALA Shop에<br />오신 것을 환영합니다 👋</h1>
+            <p class="hero-copy">
+              가입 축하 3,000포인트로 시작하세요. 매일 출석하면 1,000포인트가
+              더해집니다.
+            </p>
+            <button class="btn coral" id="heroAction">지금 시작하기</button>
+          </div>
+          <aside class="point-card">
+            <div>
+              <div class="label">나의 보유 포인트</div>
+              <div class="point-value">
+                <span id="pointValue">—</span> <small>P</small>
+              </div>
+              <div class="checkin-note">매일 출석하고 +1,000P</div>
+            </div>
+            <button class="btn primary" id="checkInButton">
+              오늘 출석 체크
+            </button>
+          </aside>
+        </div>
+
+        <div class="section-head">
+          <div>
+            <h2>오늘의 상품</h2>
+            <p>포인트로 바로 주문할 수 있어요.</p>
+          </div>
+          <input
+            class="search"
+            id="productSearch"
+            type="search"
+            placeholder="상품명 검색"
+            aria-label="상품명 검색"
+          />
+        </div>
+        <div class="product-grid" id="productGrid"></div>
+      </section>
+
+      <section class="view" id="ordersView">
+        <div class="section-head">
+          <div>
+            <h2>내 주문</h2>
+            <p>주문 수량을 확인하고 필요한 만큼 취소할 수 있습니다.</p>
+          </div>
+        </div>
+        <div class="panel"><div id="orderList" class="order-list"></div></div>
+      </section>
+
+      <section class="view" id="favoritesView">
+        <div class="section-head">
+          <div>
+            <h2>찜 목록</h2>
+            <p>마음에 둔 상품을 모아보세요.</p>
+          </div>
+        </div>
+        <div class="product-grid" id="favoriteGrid"></div>
+      </section>
+
+      <section class="view" id="adminView">
+        <div class="section-head">
+          <div>
+            <h2>상품 관리</h2>
+            <p>상품을 등록하거나 가격과 이름을 수정할 수 있습니다.</p>
+          </div>
+        </div>
+        <div class="account-grid">
+          <div class="panel">
+            <h2>새 상품 등록</h2>
+            <form class="form" id="productForm" style="margin-top: 20px">
+              <label
+                >상품명<input
+                  id="newProductName"
+                  required
+                  placeholder="상품명을 입력하세요"
+              /></label>
+              <label
+                >가격<input
+                  id="newProductPrice"
+                  required
+                  min="1"
+                  type="number"
+                  placeholder="가격"
+              /></label>
+              <button class="btn primary" type="submit">상품 등록</button>
+            </form>
+          </div>
+          <div class="panel">
+            <h2>등록 상품</h2>
+            <div class="admin-products" id="adminProducts"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="authDialog">
+      <div class="dialog-body">
+        <div class="dialog-head">
+          <h2>SKALA Shop</h2>
+          <button class="close" data-close="authDialog" aria-label="닫기">
+            ×
+          </button>
+        </div>
+        <div class="tabs">
+          <button class="tab active" data-auth="login">로그인</button
+          ><button class="tab" data-auth="signup">회원가입</button>
+        </div>
+        <form class="form" id="authForm">
+          <label
+            >아이디<input id="authId" required autocomplete="username"
+          /></label>
+          <label
+            >비밀번호<input
+              id="authPassword"
+              required
+              type="password"
+              autocomplete="current-password"
+          /></label>
+          <button class="btn primary" id="authSubmit" type="submit">
+            로그인
+          </button>
+        </form>
+      </div>
+      <div class="toast dialog-toast" role="status" aria-live="polite"></div>
+    </dialog>
+
+    <dialog id="editDialog">
+      <div class="dialog-body">
+        <div class="dialog-head">
+          <h2>상품 수정</h2>
+          <button class="close" data-close="editDialog" aria-label="닫기">
+            ×
+          </button>
+        </div>
+        <form class="form" id="editForm">
+          <input id="editProductId" type="hidden" />
+          <label>상품명<input id="editProductName" required /></label>
+          <label
+            >가격<input id="editProductPrice" required min="1" type="number"
+          /></label>
+          <button class="btn primary" type="submit">변경 저장</button>
+        </form>
+      </div>
+      <div class="toast dialog-toast" role="status" aria-live="polite"></div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+      const state = {
+        customerId: localStorage.getItem("shopCustomerId"),
+        point: null,
+        products: [],
+        favorites: new Set(),
+        authMode: "login",
+      };
+
+      const $ = (selector) => document.querySelector(selector);
+      const won = (value) => Number(value || 0).toLocaleString("ko-KR");
+      const productIcon = (name = "") =>
+        name.includes("마우스")
+          ? "🖱️"
+          : name.includes("키보드")
+            ? "⌨️"
+            : name.includes("허브")
+              ? "🔌"
+              : name.includes("노트북")
+                ? "💻"
+                : name.includes("헤드폰")
+                  ? "🎧"
+                  : name.includes("카메라")
+                    ? "📷"
+                    : "📦";
+
+      async function api(path, options = {}) {
+        const response = await fetch(path, {
+          ...options,
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {}),
+          },
+        });
+        const body =
+          response.status === 204
+            ? null
+            : await response.json().catch(() => null);
+        if (!response.ok)
+          throw new Error(
+            body?.message || `요청에 실패했습니다. (${response.status})`,
+          );
+        return body;
+      }
+
+      function toast(message, error = false) {
+        const openDialog = document.querySelector("dialog[open]");
+        const el = openDialog?.querySelector(".dialog-toast") || $("#toast");
+        document
+          .querySelectorAll(".toast")
+          .forEach((item) => (item.className = item.classList.contains("dialog-toast") ? "toast dialog-toast" : "toast"));
+        el.textContent = message;
+        el.className = `${el.classList.contains("dialog-toast") ? "toast dialog-toast" : "toast"} show${error ? " error" : ""}`;
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(() => {
+          el.className = el.classList.contains("dialog-toast")
+            ? "toast dialog-toast"
+            : "toast";
+        }, 2600);
+      }
+
+      function requireLogin() {
+        if (state.customerId) return true;
+        $("#authDialog").showModal();
+        toast("로그인이 필요한 기능입니다.");
+        return false;
+      }
+
+      function setSession(customer) {
+        state.customerId = customer?.customerId || null;
+        state.point = customer?.customerPoint ?? null;
+        if (state.customerId)
+          localStorage.setItem("shopCustomerId", state.customerId);
+        else localStorage.removeItem("shopCustomerId");
+        renderSession();
+      }
+
+      function renderSession() {
+        const loggedIn = Boolean(state.customerId);
+        $("#userLabel").hidden = !loggedIn;
+        $("#userLabel").textContent = loggedIn ? `${state.customerId}님` : "";
+        $("#authButton").textContent = loggedIn ? "로그아웃" : "로그인";
+        $("#loginBanner").hidden = loggedIn;
+        $("#bannerAuth").textContent = loggedIn ? "내 주문 보기" : "로그인";
+        $("#heroAction").textContent = loggedIn
+          ? "상품 둘러보기"
+          : "지금 시작하기";
+        $("#pointValue").textContent =
+          state.point == null ? "—" : won(state.point);
+      }
+
+      function showView(name) {
+        document
+          .querySelectorAll(".view")
+          .forEach((el) =>
+            el.classList.toggle("active", el.id === `${name}View`),
+          );
+        document
+          .querySelectorAll(".nav-btn")
+          .forEach((el) =>
+            el.classList.toggle("active", el.dataset.view === name),
+          );
+        if (name === "orders") loadOrders();
+        if (name === "favorites") loadFavorites();
+        if (name === "admin") renderAdmin();
+      }
+
+      function productCard(product) {
+        const favorite = state.favorites.has(product.id);
+        return `<article class="product">
+          <div class="product-visual" aria-hidden="true">${productIcon(product.productName)}</div>
+          <div class="product-meta">
+            <div><h3>${escapeHtml(product.productName)}</h3><div class="price" data-unit-price="${product.productPrice}">${won(product.productPrice)} P</div></div>
+            <button class="heart ${favorite ? "on" : ""}" data-favorite="${product.id}" aria-label="찜 상태 변경">${favorite ? "♥" : "♡"}</button>
+          </div>
+          <div class="buy-row">
+            <input class="qty" type="number" min="1" value="1" aria-label="주문 수량" />
+            <button class="btn primary" data-order="${product.id}">포인트로 주문</button>
+          </div>
+        </article>`;
+      }
+
+      function escapeHtml(value) {
+        const div = document.createElement("div");
+        div.textContent = value;
+        return div.innerHTML;
+      }
+
+      async function loadProducts() {
+        try {
+          state.products = await api("/api/products");
+          renderProducts();
+          renderAdmin();
+        } catch (error) {
+          toast(error.message, true);
+        }
+      }
+
+      function renderProducts() {
+        const keyword = $("#productSearch").value.trim().toLowerCase();
+        const items = state.products.filter((p) =>
+          p.productName.toLowerCase().includes(keyword),
+        );
+        $("#productGrid").innerHTML = items.length
+          ? items.map(productCard).join("")
+          : '<div class="empty">검색 결과가 없습니다.</div>';
+      }
+
+      async function loadCustomer() {
+        if (!state.customerId) return;
+        try {
+          const data = await api(
+            `/api/customers/${encodeURIComponent(state.customerId)}`,
+          );
+          state.point = data.customerPoint;
+          renderSession();
+          await loadFavorites(false);
+        } catch (error) {
+          setSession(null);
+          toast("로그인 정보를 다시 확인해 주세요.", true);
+        }
+      }
+
+      async function loadFavorites(render = true) {
+        if (!requireLogin()) return;
+        try {
+          const favorites = await api(
+            `/api/customers/${encodeURIComponent(state.customerId)}/favorites`,
+          );
+          state.favorites = new Set(favorites.map((item) => item.productId));
+          renderProducts();
+          if (render) {
+            const items = state.products.filter((p) =>
+              state.favorites.has(p.id),
+            );
+            $("#favoriteGrid").innerHTML = items.length
+              ? items.map(productCard).join("")
+              : '<div class="empty">아직 찜한 상품이 없습니다.</div>';
+          }
+        } catch (error) {
+          toast(error.message, true);
+        }
+      }
+
+      async function toggleFavorite(productId) {
+        if (!requireLogin()) return;
+        try {
+          const result = await api(
+            `/api/customers/${encodeURIComponent(state.customerId)}/favorites/${productId}`,
+            { method: "POST" },
+          );
+          result.favorite
+            ? state.favorites.add(productId)
+            : state.favorites.delete(productId);
+          renderProducts();
+          if ($("#favoritesView").classList.contains("active")) loadFavorites();
+          toast(
+            result.favorite ? "찜 목록에 추가했습니다." : "찜을 취소했습니다.",
+          );
+        } catch (error) {
+          toast(error.message, true);
+        }
+      }
+
+      async function order(productId, quantity, card) {
+        if (!requireLogin()) return;
+        try {
+          const result = await api("/api/customers/order", {
+            method: "POST",
+            body: JSON.stringify({
+              customerId: state.customerId,
+              productId,
+              quantity,
+            }),
+          });
+          state.point = result.customerPoint;
+          renderSession();
+          const quantityInput = card.querySelector(".qty");
+          const price = card.querySelector("[data-unit-price]");
+          quantityInput.value = 1;
+          price.textContent = `${won(Number(price.dataset.unitPrice))} P`;
+          toast("주문이 완료되었습니다.");
+        } catch (error) {
+          toast(error.message, true);
+        }
+      }
+
+      async function loadOrders() {
+        if (!requireLogin()) return;
+        try {
+          const data = await api(
+            `/api/customers/${encodeURIComponent(state.customerId)}`,
+          );
+          state.point = data.customerPoint;
+          renderSession();
+          $("#orderList").innerHTML = data.products.length
+            ? data.products
+                .map(
+                  (item) => `<div class="order-row">
+            <div><strong>${escapeHtml(item.productName)}</strong><span>${won(item.productPrice)}P × ${item.quantity}개</span></div>
+            <strong>${won(item.productPrice * item.quantity)}P</strong>
+            <button class="btn small danger" data-cancel="${item.productId}" data-max="${item.quantity}">주문 취소</button>
+          </div>`,
+                )
+                .join("")
+            : '<div class="empty">주문한 상품이 없습니다.</div>';
+        } catch (error) {
+          toast(error.message, true);
+        }
+      }
+
+      async function cancelOrder(productId, max) {
+        const raw = prompt(`취소할 수량을 입력하세요. (최대 ${max}개)`, "1");
+        if (raw === null) return;
+        const quantity = Number(raw);
+        if (!Number.isInteger(quantity) || quantity < 1 || quantity > max)
+          return toast("올바른 취소 수량을 입력해 주세요.", true);
+        try {
+          const result = await api("/api/customers/cancel", {
+            method: "POST",
+            body: JSON.stringify({
+              customerId: state.customerId,
+              productId,
+              quantity,
+            }),
+          });
+          state.point = result.customerPoint;
+          renderSession();
+          loadOrders();
+          toast("주문을 취소하고 포인트를 환급했습니다.");
+        } catch (error) {
+          toast(error.message, true);
+        }
+      }
+
+      async function checkIn() {
+        if (!requireLogin()) return;
+        try {
+          const result = await api(
+            `/api/customers/${encodeURIComponent(state.customerId)}/check-in`,
+            { method: "POST" },
+          );
+          state.point = result.customerPoint;
+          renderSession();
+          toast(`${result.message} +${won(result.rewardPoint)}P`);
+        } catch (error) {
+          toast(error.message, true);
+        }
+      }
+
+      function renderAdmin() {
+        const el = $("#adminProducts");
+        if (!el) return;
+        el.innerHTML = state.products.length
+          ? state.products
+              .map(
+                (p) => `<div class="admin-row">
+          <strong>${escapeHtml(p.productName)}</strong><span>${won(p.productPrice)}P</span>
+          <div><button class="btn small" data-edit="${p.id}">수정</button> <button class="btn small danger" data-delete="${p.id}">삭제</button></div>
+        </div>`,
+              )
+              .join("")
+          : '<div class="empty">등록된 상품이 없습니다.</div>';
+      }
+
+      document.addEventListener("click", async (event) => {
+        const nav = event.target.closest("[data-view]");
+        if (nav) showView(nav.dataset.view);
+        const favorite = event.target.closest("[data-favorite]");
+        if (favorite) toggleFavorite(Number(favorite.dataset.favorite));
+        const orderButton = event.target.closest("[data-order]");
+        if (orderButton) {
+          const card = orderButton.closest(".product");
+          const quantity = Number(card.querySelector(".qty").value || 1);
+          order(Number(orderButton.dataset.order), quantity, card);
+        }
+        const cancel = event.target.closest("[data-cancel]");
+        if (cancel)
+          cancelOrder(
+            Number(cancel.dataset.cancel),
+            Number(cancel.dataset.max),
+          );
+        const edit = event.target.closest("[data-edit]");
+        if (edit) {
+          const product = state.products.find(
+            (p) => p.id === Number(edit.dataset.edit),
+          );
+          $("#editProductId").value = product.id;
+          $("#editProductName").value = product.productName;
+          $("#editProductPrice").value = product.productPrice;
+          $("#editDialog").showModal();
+        }
+        const remove = event.target.closest("[data-delete]");
+        if (remove && confirm("이 상품을 삭제할까요?")) {
+          try {
+            await api(`/api/products/${remove.dataset.delete}`, {
+              method: "DELETE",
+            });
+            await loadProducts();
+            toast("상품을 삭제했습니다.");
+          } catch (error) {
+            toast(error.message, true);
+          }
+        }
+        const close = event.target.closest("[data-close]");
+        if (close) document.getElementById(close.dataset.close).close();
+      });
+
+      document.addEventListener("input", (event) => {
+        if (!event.target.matches(".qty")) return;
+        const card = event.target.closest(".product");
+        const price = card.querySelector("[data-unit-price]");
+        const quantity = Math.max(1, Number(event.target.value) || 1);
+        price.textContent = `${won(Number(price.dataset.unitPrice) * quantity)} P`;
+      });
+
+      document.querySelectorAll("[data-auth]").forEach((tab) =>
+        tab.addEventListener("click", () => {
+          state.authMode = tab.dataset.auth;
+          document
+            .querySelectorAll("[data-auth]")
+            .forEach((el) => el.classList.toggle("active", el === tab));
+          $("#authSubmit").textContent =
+            state.authMode === "login" ? "로그인" : "가입하고 3,000P 받기";
+        }),
+      );
+
+      $("#authButton").addEventListener("click", () => {
+        if (state.customerId) {
+          setSession(null);
+          state.favorites.clear();
+          renderProducts();
+          toast("로그아웃했습니다.");
+        } else $("#authDialog").showModal();
+      });
+      $("#bannerAuth").addEventListener("click", () => {
+        state.customerId ? showView("orders") : $("#authDialog").showModal();
+      });
+      $("#userLabel").addEventListener("click", () => showView("orders"));
+      $("#heroAction").addEventListener("click", () =>
+        state.customerId
+          ? $("#productGrid").scrollIntoView({ behavior: "smooth" })
+          : $("#authDialog").showModal(),
+      );
+      $("#checkInButton").addEventListener("click", checkIn);
+      $("#productSearch").addEventListener("input", renderProducts);
+
+      $("#authForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const customerId = $("#authId").value.trim();
+        const customerPassword = $("#authPassword").value;
+        try {
+          if (state.authMode === "signup") {
+            const result = await api("/api/customers", {
+              method: "POST",
+              body: JSON.stringify({ customerId, customerPassword }),
+            });
+            toast(
+              `${result.message} ${won(result.signupBonusPoint)}P가 지급됐습니다.`,
+            );
+            state.authMode = "login";
+            document.querySelector('[data-auth="login"]').click();
+            return;
+          }
+          const customer = await api("/api/customers/login", {
+            method: "POST",
+            body: JSON.stringify({ customerId, customerPassword }),
+          });
+          setSession(customer);
+          $("#authDialog").close();
+          await loadFavorites(false);
+          toast(`${customer.customerId}님, 반갑습니다.`);
+        } catch (error) {
+          toast(error.message, true);
+        }
+      });
+
+      $("#productForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        try {
+          await api("/api/products", {
+            method: "POST",
+            body: JSON.stringify({
+              productName: $("#newProductName").value.trim(),
+              productPrice: Number($("#newProductPrice").value),
+            }),
+          });
+          event.target.reset();
+          await loadProducts();
+          toast("상품을 등록했습니다.");
+        } catch (error) {
+          toast(error.message, true);
+        }
+      });
+
+      $("#editForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        try {
+          await api(`/api/products/${$("#editProductId").value}`, {
+            method: "PUT",
+            body: JSON.stringify({
+              productName: $("#editProductName").value.trim(),
+              productPrice: Number($("#editProductPrice").value),
+            }),
+          });
+          $("#editDialog").close();
+          await loadProducts();
+          toast("상품 정보를 수정했습니다.");
+        } catch (error) {
+          toast(error.message, true);
+        }
+      });
+
+      renderSession();
+      loadProducts();
+      loadCustomer();
+    </script>
+  </body>
+</html>
