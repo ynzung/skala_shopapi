@@ -36,6 +36,12 @@ public class GlobalExceptionHandler {
         return response(ErrorCode.REWARD_ALREADY_RECEIVED, exception.getMessage());
     }
 
+    @ExceptionHandler(DuplicateFavoriteException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateFavorite(
+            DuplicateFavoriteException exception
+    ) {
+        return response(ErrorCode.FAVORITE_ALREADY_EXISTS, exception.getMessage());
+    }
 
     @ExceptionHandler(ParameterException.class)
     public ResponseEntity<ErrorResponse> handleParameter(

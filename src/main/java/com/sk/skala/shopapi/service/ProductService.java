@@ -9,6 +9,7 @@ import com.sk.skala.shopapi.dto.ProductDto;
 import com.sk.skala.shopapi.entity.Product;
 import com.sk.skala.shopapi.exception.DataNotFoundException;
 import com.sk.skala.shopapi.repository.ProductRepository;
+import com.sk.skala.shopapi.repository.FavoriteRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class ProductService {
     private final ProductRepository productRepository;
+    private final FavoriteRepository favoriteRepository;
 
     // 1. 전체 상품 목록 조회
     public List<ProductDto> getAllProduct() {
@@ -66,6 +68,7 @@ public class ProductService {
             throw new DataNotFoundException("상품을 찾을 수 없습니다: " + id);
         }
 
+        favoriteRepository.deleteByProductId(id);
         productRepository.deleteById(id);
     }
 

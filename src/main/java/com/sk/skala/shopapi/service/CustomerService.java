@@ -1,5 +1,6 @@
 package com.sk.skala.shopapi.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -7,21 +8,25 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sk.skala.shopapi.dto.CheckInResponse;
 import com.sk.skala.shopapi.dto.CustomerDto;
+import com.sk.skala.shopapi.dto.FavoriteDto;
 import com.sk.skala.shopapi.dto.OrderItemDto;
 import com.sk.skala.shopapi.dto.OrderListDto;
 import com.sk.skala.shopapi.dto.SignupResponse;
 import com.sk.skala.shopapi.entity.Customer;
 import com.sk.skala.shopapi.entity.DailyCheckIn;
+import com.sk.skala.shopapi.entity.Favorite;
 import com.sk.skala.shopapi.entity.OrderItem;
 import com.sk.skala.shopapi.entity.Product;
 import com.sk.skala.shopapi.exception.DataNotFoundException;
 import com.sk.skala.shopapi.exception.DuplicateCustomerException;
+import com.sk.skala.shopapi.exception.DuplicateFavoriteException;
 import com.sk.skala.shopapi.exception.InsufficientFundsException;
 import com.sk.skala.shopapi.exception.ParameterException;
 import com.sk.skala.shopapi.exception.RewardAlreadyReceivedException;
 import com.sk.skala.shopapi.repository.CustomerProductRepository;
 import com.sk.skala.shopapi.repository.CustomerRepository;
 import com.sk.skala.shopapi.repository.DailyCheckInRepository;
+import com.sk.skala.shopapi.repository.FavoriteRepository;
 import com.sk.skala.shopapi.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -38,6 +43,7 @@ public class CustomerService {
     private final ProductRepository productRepository;
     private final CustomerProductRepository customerProductRepository;
     private final DailyCheckInRepository dailyCheckInRepository;
+    private final FavoriteRepository favoriteRepository;
 
     // 1. 전체 고객 목록 조회
     public List<CustomerDto> getAllCustomer() {
@@ -131,6 +137,7 @@ public class CustomerService {
 
         customerProductRepository.deleteAll(orderItems);
         dailyCheckInRepository.deleteByCustomerCustomerId(customerId);
+        favoriteRepository.deleteByCustomerCustomerId(customerId);
         customerRepository.delete(customer);
     }
 
@@ -162,6 +169,46 @@ public class CustomerService {
                 DAILY_CHECK_IN_POINT,
                 customer.getCustomerPoint()
         );
+    }
+
+        @Transactional
+    public FavoriteDto addFavorite(String customerId, Long productId) {
+        Customer customer = findCustomerById(customerId);
+        Product product = findProductById(productId);
+
+        if (favoriteRepository
+                .existsByCustomerCustomerIdAndProductId(customerId, productId)) {
+            throw new DuplicateFavoriteException("이미 찜한 상품입니다.");
+        }
+
+        favoriteRepository.save(
+                Favorite.builder()
+                        .customer(customer)
+                        .product(product)
+                        .build()
+        );
+        return convertToFavoriteDto(product);
+    }
+
+    public List<FavoriteDto> getFavorites(String customerId) {
+        findCustomerById(customerId);
+        return favoriteRepository.findByCustomerCustomerId(customerId)
+                .stream()
+                .map(favorite -> convertToFavoriteDto(favorite.getProduct()))
+                .toList();
+    }
+
+    @Transactional
+    public void deleteFavorite(String customerId, Long productId) {
+        findCustomerById(customerId);
+        Favorite favorite = favoriteRepository
+                .findByCustomerCustomerIdAndProductId(customerId, productId)
+                .orElseThrow(
+                        () -> new DataNotFoundException(
+                                "찜한 상품을 찾을 수 없습니다."
+                        )
+                );
+        favoriteRepository.delete(favorite);
     }
 
     // 7. 상품 주문
@@ -296,5 +343,13 @@ public class CustomerService {
                 .productPrice(product.getProductPrice())
                 .quantity(orderItem.getQuantity())
                 .build();
+    }
+
+    private FavoriteDto convertToFavoriteDto(Product product) {
+        return new FavoriteDto(
+                product.getId(),
+                product.getProductName(),
+                product.getProductPrice()
+        );
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.sk.skala.shopapi.dto.CustomerDto;
 import com.sk.skala.shopapi.dto.CheckInResponse;
+import com.sk.skala.shopapi.dto.FavoriteDto;
 import com.sk.skala.shopapi.dto.LoginRequest;
 import com.sk.skala.shopapi.dto.OrderItemDto;
 import com.sk.skala.shopapi.dto.OrderListDto;
@@ -124,6 +125,34 @@ public class CustomerController {
             @PathVariable String customerId
     ) {
         return ResponseEntity.ok(customerService.checkIn(customerId));
+    }
+
+    @PostMapping("/{customerId}/favorites/{productId}")
+    @Operation(summary = "상품 찜하기", description = "고객의 찜 목록에 상품을 추가합니다.")
+    public ResponseEntity<FavoriteDto> addFavorite(
+            @PathVariable String customerId,
+            @PathVariable Long productId
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(customerService.addFavorite(customerId, productId));
+    }
+
+    @GetMapping("/{customerId}/favorites")
+    @Operation(summary = "찜 목록 조회", description = "고객이 찜한 상품 목록을 조회합니다.")
+    public ResponseEntity<List<FavoriteDto>> getFavorites(
+            @PathVariable String customerId
+    ) {
+        return ResponseEntity.ok(customerService.getFavorites(customerId));
+    }
+
+    @DeleteMapping("/{customerId}/favorites/{productId}")
+    @Operation(summary = "상품 찜 취소", description = "고객의 찜 목록에서 상품을 삭제합니다.")
+    public ResponseEntity<Void> deleteFavorite(
+            @PathVariable String customerId,
+            @PathVariable Long productId
+    ) {
+        customerService.deleteFavorite(customerId, productId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/order")
